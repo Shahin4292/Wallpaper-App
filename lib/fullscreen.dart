@@ -12,13 +12,13 @@ class Fullscreen extends StatefulWidget {
 }
 
 class _FullscreenState extends State<Fullscreen> {
-
-  Future<void> setWallpaper() async{
+  Future<void> setWallpaper() async {
     int location = WallpaperManager.HOME_SCREEN;
     var file = await DefaultCacheManager().getSingleFile(widget.imageUrl);
-     String result =
+    String result =
         WallpaperManager.setWallpaperFromFile(file.path, location).toString();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +30,10 @@ class _FullscreenState extends State<Fullscreen> {
               child: Image.network(widget.imageUrl),
             )),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                setWallpaper();
+                // Navigator.pop(context);
+              },
               child: Container(
                 height: 60,
                 width: MediaQuery.sizeOf(context).width,
