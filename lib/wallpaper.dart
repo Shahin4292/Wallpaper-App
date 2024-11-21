@@ -12,15 +12,16 @@ class Wallpaper extends StatefulWidget {
 
 class _WallpaperState extends State<Wallpaper> {
   List images = [];
+  int page = 1;
 
   @override
   void initState() {
-    fetchApi();
     super.initState();
+    fetchApi();
   }
 
-  fetchApi() {
-    http.get(Uri.parse('https://api.pexels.com/v1/curated?per_page=80'),
+  fetchApi() async {
+    await http.get(Uri.parse('https://api.pexels.com/v1/curated?per_page=80'),
         headers: {
           'Authorization':
               "PzrwjMFFdssYI6z3sTYrAFpGwUnlnTE0Nft6rnGEsy8O6A0gKvBf6khO"
@@ -29,7 +30,22 @@ class _WallpaperState extends State<Wallpaper> {
       setState(() {
         images = result['photos'];
       });
-      print(images);
+      print(images[0]);
+    });
+  }
+
+  loadMore() async {
+    setState(() {
+      page = page + 1;
+    });
+    String url =
+        'https://api.pexels.com/v1/curated?per_page=80&page=' + page.toString();
+    await http.get(Uri.parse(url), headers: {'Authorization': 'YOUR_KEY'}).then(
+        (value) {
+      Map result = jsonDecode(value.body);
+      setState(() {
+        images.addAll(result['photos']);
+      });
     });
   }
 
@@ -56,17 +72,22 @@ class _WallpaperState extends State<Wallpaper> {
                   );
                 }),
           ),
-          Container(
-            height: 60,
-            width: MediaQuery.sizeOf(context).width,
-            color: Colors.black,
-            child: const Center(
-              child: Text(
-                "Load more",
-                style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold),
+          InkWell(
+            onTap: () {
+              loadMore();
+            },
+            child: Container(
+              height: 60,
+              width: MediaQuery.sizeOf(context).width,
+              color: Colors.black,
+              child: const Center(
+                child: Text(
+                  "Load more",
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           )
